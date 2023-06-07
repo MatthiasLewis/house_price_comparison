@@ -7,7 +7,7 @@ import numpy as np
 data_file=os.listdir("D:\practice\house_price_comparison\opendata")
 print(data_file)
 #轉換表
-trans = str.maketrans("一二三四五六七八九層有無全","123456789FYNA") 
+trans = str.maketrans("一二三四五六七八九十層有無全","1234567890FYNA") 
 
 #取出每一個檔名，若為.csv則讀取內容(清理資料)
 for file in data_file:
@@ -16,7 +16,7 @@ for file in data_file:
     if ".csv" not in file:   #若檔案為.py則跳過
         continue
     #以utf8開啟
-    with open (file,"r",encoding="utf8") as f:
+    with open (file,"r",encoding="utf-8") as f:
         f1 = f.readlines()   #讀出來為一個list
     for f2 in f1[3:]:  #扣除每個檔案的前3行標題列，進行資料格式清理，一一放入data_list中
         pattern = r"\w+層,.*?/\w+層"   #查找符合層,*層的結構，若有，跳過該筆資料
@@ -45,6 +45,8 @@ for file in data_file:
                 f2[times] = f2[times].replace(a,b)
             
             elif re.search(r"/\w+層", f2[times]) :  #轉換樓層
+                if re.search(r"\w十層", f2[times]):   #若為幾十層
+                    f2[times] = f2[times].replace("十層","0F")
                 if "十層" in f2[times]:   #若內容有十層，將十層換成10F
                     f2[times] = f2[times].replace("十層","10F")
                 if re.search(r"\w十\w層", f2[times]):   #若為幾十幾層，去除十
@@ -85,9 +87,30 @@ for file in data_file:
     df = pd.DataFrame(data_list,columns=["date","total_price(萬)","square(坪)","square_price(萬/坪)", \
                                          "主建物佔比","type","age","floor","格局","車位總價","管理組織","電梯"])     
     
+    def update_type(row):
+        print(row["floor"])
+        if "/" not in row["floor"]:
+            return row["type"]
+        second_value = row["floor"].split("/")[1].replace("F", "").replace('"',"")
+        first_value = row["floor"].split("/")[0]
+        if second_value =="--" :
+           return "透天厝"
+        elif first_value =="A":
+           return "透天厝"
+        elif int(second_value) > 10 and row["type"] != "住宅大樓":
+            return "住宅大樓"
+        elif 5 < int(second_value) <= 10 and row["type"] != "華廈":
+            return "華廈"
+        elif int(second_value) <= 5 and row["type"] != "公寓":
+            return "公寓"
+        else:
+            return row["type"]  # 保持原值
+
+
     df["age"] = df["age"].replace("",None)
     df = df.drop(columns="車位總價")
     df = df.drop(columns="管理組織")
+    df = df.drop(columns="電梯")
     #設定欄位類型，並設定float欄位小數點長度
     df["date"] = pd.to_datetime(df["date"],format="%Y/%m/%d")
     df["total_price(萬)"] = df["total_price(萬)"].astype(np.float32)
@@ -95,12 +118,16 @@ for file in data_file:
     df["square(坪)"] =df["square(坪)"].apply(lambda x: round(x, 2))
     df["square_price(萬/坪)"] = df["square_price(萬/坪)"].astype(np.float32)
     df["square_price(萬/坪)"] =df["square_price(萬/坪)"].apply(lambda x: round(x, 2))
-     
+    
+    df["type"] = df.apply(update_type, axis=1)
     print(df.dtypes,df)
     if "文山" in file:
-        df.to_csv(f"D:\\practice\\house_price_comparison\\opendata\\refresh_data\\Wenshan_{file[3:7]}.csv",index=False,header = False,mode ="w")
-    elif "新店" in file: 
-        df.to_csv(f"D:\\practice\\house_price_comparison\\opendata\\refresh_data\\Xindian_{file[3:7]}.csv",index=False,header = False,mode ="a")
+        df.to_csv(f"D:\\practice\\house_price_comparison\\opendata\\refresh_data\\Wenshan_{file[3:6]}.csv",index=False,mode ="w")
+    elif "新店" in file:
+        if f"Xindian_{file[3:6]}.csv" not in os.listdir("D:\\practice\\house_price_comparison\\opendata\\refresh_data") :
+            df.to_csv(f"D:\\practice\\house_price_comparison\\opendata\\refresh_data\\Xindian_{file[3:6]}.csv",index=False,mode ="a")
+        else:
+            df.to_csv(f"D:\\practice\\house_price_comparison\\opendata\\refresh_data\\Xindian_{file[3:6]}.csv",index=False,header=False,mode ="a")
 
     
 

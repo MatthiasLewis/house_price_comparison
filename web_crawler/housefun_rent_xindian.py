@@ -107,5 +107,5 @@ driver.quit()
 print(data_list)
 
 import json
-with open("housefun_rent.json", "w", encoding='utf-8') as file:
+with open("housefun_rent_xindian.json", "w", encoding='utf-8') as file:
     file.write(json.dumps(data_list, ensure_ascii=False))

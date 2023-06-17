@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 from sqlalchemy import create_engine
 import plotly.express as px
+# import plotly.graph_objects as go
 
 #將資料庫內容導入
 engine = create_engine("sqlite:///data.db?charset=utf8")
@@ -105,6 +106,128 @@ def totalyear_avg_houseprice(data1):
     # line_chart.write_html('line_chart.html')
     bar_chart.write_html('bar_totalyearprice.html')
 
+
+
+def totalyear_avg_square(data1):
+    #複製dataframe來進行操作
+    df = data1.copy()
+    # 將日期欄位轉換成年份欄位
+    df['年份'] = pd.to_datetime(df['date']).dt.year
+    # 計算每年的平均房價，並設為索引
+    average_prices = df.groupby(['年份', '區域', 'type'])['square(坪)'].mean().reset_index()
+
+    # 繪製長條圖
+    bar_chart = px.bar(average_prices, x='年份', y='square(坪)', color='區域', barmode='group', facet_col='type', \
+                       title='每年平均坪數長條圖')
+    bar_chart.update_layout(
+    yaxis_title="坪數"
+)
+    
+    # 加入篩選器元件
+    def update_layout(fig,x):
+        fig.update_layout(
+            updatemenus=[
+                dict(
+                    buttons=list([
+                        dict(
+                            label="全部",
+                            method="update",
+                            args=[{"visible": [True, True, True,True, True, True,True]},
+                                {"title": f"每年平均坪數{x}圖 - 全部"}]
+                        ),
+                        dict(
+                            label="文山區",
+                            method="update",
+                            args=[{"visible": [True, True, True,False, False, False]},
+                                {"title": f"每年平均坪數{x}圖 - 文山區"}]
+                        ),
+                        dict(
+                            label="新店區",
+                            method="update",
+                            args=[{"visible": [False, False, False,True, True,True]},
+                                {"title": f"每年平均坪數{x}圖 - 新店區"}]
+                        ),
+                    ]),
+                    direction="down",
+                    showactive=True,
+                    x=0.8,
+                    xanchor="center",
+                    y=1.2,
+                    yanchor="top"
+                ),
+            ]
+        )
+        # fig.update_yaxes(range=[0, 40])  # 設定 y 軸的範圍，例如 0 到 50
+
+    # update_layout(line_chart,"折線")
+    update_layout(bar_chart,"長條")
+    
+    # line_chart.show()
+    bar_chart.show()
+    # # 生成HTML文件
+    # line_chart.write_html('line_chart.html')
+    bar_chart.write_html('totalyear_avg_square.html')
+
+
+def totalyear_avg_totalprice(data1):
+    #複製dataframe來進行操作
+    df = data1.copy()
+    # 將日期欄位轉換成年份欄位
+    df['年份'] = pd.to_datetime(df['date']).dt.year
+    # 計算每年的平均房價，並設為索引
+    average_prices = df.groupby(['年份', '區域', 'type'])["total_price(萬)"].mean().reset_index()
+
+    # 繪製長條圖
+    bar_chart = px.bar(average_prices, x='年份', y="total_price(萬)", color='區域', barmode='group', facet_col='type', \
+                       title='每年平均總價長條圖')
+    bar_chart.update_layout(
+    yaxis_title="總價(萬)"
+)
+    
+    # 加入篩選器元件
+    def update_layout(fig,x):
+        fig.update_layout(
+            updatemenus=[
+                dict(
+                    buttons=list([
+                        dict(
+                            label="全部",
+                            method="update",
+                            args=[{"visible": [True, True, True,True, True, True,True]},
+                                {"title": f"每年平均總價{x}圖 - 全部"}]
+                        ),
+                        dict(
+                            label="文山區",
+                            method="update",
+                            args=[{"visible": [True, True, True,False, False, False]},
+                                {"title": f"每年平均總價{x}圖 - 文山區"}]
+                        ),
+                        dict(
+                            label="新店區",
+                            method="update",
+                            args=[{"visible": [False, False, False,True, True,True]},
+                                {"title": f"每年平均總價{x}圖 - 新店區"}]
+                        ),
+                    ]),
+                    direction="down",
+                    showactive=True,
+                    x=0.8,
+                    xanchor="center",
+                    y=1.2,
+                    yanchor="top"
+                ),
+            ]
+        )
+        # fig.update_yaxes(range=[0, 40])  # 設定 y 軸的範圍，例如 0 到 50
+
+    # update_layout(line_chart,"折線")
+    update_layout(bar_chart,"長條")
+    
+    # line_chart.show()
+    bar_chart.show()
+    # # 生成HTML文件
+    # line_chart.write_html('line_chart.html')
+    bar_chart.write_html('totalyear_avg_totalprice.html')
 
 
 
@@ -331,7 +454,72 @@ def year_30avg_houseprice(data1,year,dis):
 
 
 
-def age_type_trading(data1,dis):
+def type_trading(data1):
+    #複製dataframe來進行操作
+    df = data1.copy()
+    # 將日期欄位轉換成年份欄位
+    df['年份'] = pd.to_datetime(df['date']).dt.year
+
+    df['成交量'] = df.groupby(['年份',"區域", 'type'])['年份'].transform('count')
+    # print(df.loc[df["屋齡"]=="10-20年"].head(100))
+
+    #計算每年的平均房價，並設為索引
+    total_trading = df.groupby(['年份', "區域",'type'])["成交量"].mean().reset_index() 
+
+    # 繪製長條圖
+    scatter_chart = px.scatter(total_trading,x='年份', y="成交量", color='type', facet_col="區域", \
+                    title='各房型成交量')
+    
+    # 加入篩選器元件
+    def update_layout(fig):
+        fig.update_layout(
+            updatemenus=[
+                dict(
+                    buttons=list([
+                        dict(
+                            label="全部",
+                            method="update",
+                            args=[{"visible": [True, True, True,True, True, True]},
+                                {"title": "各房型成交量 - 全部"}]
+                        ),
+                        dict(
+                            label="華廈",
+                            method="update",
+                            args=[{"visible":  [False, False, False,False,True, True]},
+                                {"title": "各房型成交量 - 華廈"}]
+                        ),
+                        dict(
+                            label="公寓",
+                            method="update",
+                            args=[{"visible": [False, False, True,True,False, False]},
+                                {"title": "各房型成交量 - 公寓"}]
+                        ),
+                        dict(
+                            label="住宅大樓",
+                            method="update",
+                            args=[{"visible": [True, True, False, False,False, False]},
+                                {"title": "各房型成交量 - 住宅大樓"}]
+                        ),
+                    ]),
+                    direction="down",
+                    showactive=True,
+                    x=0.8,
+                    xanchor="center",
+                    y=1.2,
+                    yanchor="top"
+                ),
+            ]
+        )
+        fig.update_yaxes(range=[100, 700])  # 設定 y 軸的範圍，例如 0 到 50
+
+    update_layout(scatter_chart)
+    
+    scatter_chart.show()
+    # # 生成HTML文件
+    scatter_chart.write_html(f'scatter_trading_type.html')
+
+
+def age_trading(data1):
     #複製dataframe來進行操作
     df = data1.copy()
     # 將日期欄位轉換成年份欄位
@@ -345,18 +533,18 @@ def age_type_trading(data1,dis):
     df.loc[(df["age"] > 20) & (df["age"] <= 30), "屋齡"] = "20-30年"
     df.loc[(df["age"] > 30) , "屋齡"] = "30年以上"
 
-    df['成交量'] = df.groupby(['年份',"區域", 'type','屋齡'])['年份'].transform('count')
+    df['成交量'] = df.groupby(['年份',"區域",'屋齡'])['年份'].transform('count')
     print(df.loc[df["屋齡"]=="10-20年"].head(100))
 
     #計算每年的平均房價，並設為索引
-    total_trading = df.loc[df["區域"] == dis].groupby(['年份', 'type', '屋齡'])["成交量"].mean().reset_index() 
+    total_trading = df.groupby(['年份',"區域", '屋齡'])["成交量"].mean().reset_index() 
 
     # 繪製長條圖
-    scatter_chart = px.scatter(total_trading,x='年份', y="成交量", color='type', facet_col="屋齡", \
-                    title=f'{dis}各屋齡房型成交量')
+    scatter_chart = px.scatter(total_trading,x='年份', y="成交量", color='屋齡', facet_col="區域", \
+                    title='各屋齡成交量')
     
     # 加入篩選器元件
-    def update_layout(fig,x):
+    def update_layout(fig):
         fig.update_layout(
             updatemenus=[
                 dict(
@@ -365,25 +553,31 @@ def age_type_trading(data1,dis):
                             label="全部",
                             method="update",
                             args=[{"visible": [True, True, True,True, True, True,True]},
-                                {"title": f"{dis}各屋齡房價成交量 - 全部"}]
+                                {"title": "各屋齡成交量 - 全部"}]
                         ),
                         dict(
-                            label="華廈",
+                            label="0-10年",
                             method="update",
-                            args=[{"visible":  [False, False, False,False,False, False, False,False,True,True,True,True]},
-                                {"title": f"{dis}各屋齡房價成交量 - 華廈"}]
+                            args=[{"visible":  [True,True, False,False,False, False, False, False]},
+                                {"title": "各屋齡成交量 - 0-10年"}]
                         ),
                         dict(
-                            label="公寓",
+                            label="10-20年",
                             method="update",
-                            args=[{"visible": [False, False, False,False,True, True, True,True,False,False]},
-                                {"title": f"{dis}各屋齡房價成交量 - 公寓"}]
+                            args=[{"visible": [False, False, True,True,False, False,False, False]},
+                                {"title": "各屋齡成交量 - 10-20年"}]
                         ),
                         dict(
-                            label="住宅大樓",
+                            label="20-30年",
                             method="update",
-                            args=[{"visible": [True, True, True,True,False, False, False,False,False,False,False,False]},
-                                {"title": f"{dis}各屋齡房價成交量 - 住宅大樓"}]
+                            args=[{"visible": [False, False, False, False,True,True, False,False]},
+                                {"title": "各屋齡成交量 - 20-30年"}]
+                        ),
+                        dict(
+                            label="30年以上",
+                            method="update",
+                            args=[{"visible": [False, False, False, False,False, False,True,True]},
+                                {"title": "各屋齡成交量 - 30年以上"}]
                         ),
                     ]),
                     direction="down",
@@ -397,14 +591,164 @@ def age_type_trading(data1,dis):
         )
         # fig.update_yaxes(range=[10, 700])  # 設定 y 軸的範圍，例如 0 到 50
 
-    # update_layout(line_chart,"折線")
-    update_layout(scatter_chart,"長條")
+    update_layout(scatter_chart)
     
-    # line_chart.show()
     scatter_chart.show()
     # # 生成HTML文件
+    scatter_chart.write_html(f'scatter_trading_age.html')
+
+
+def age_avg_square(data1,dis):
+    #複製dataframe來進行操作
+    df = data1.copy()
+    # 將日期欄位轉換成年份欄位
+    df['年份'] = pd.to_datetime(df['date']).dt.year
+
+    #創屋齡group欄位
+    # 將 age 在小於等於 10 的設為 "0-10"
+    df["屋齡"] = np.where(df["age"] <= 10, "0-10年", "")
+    # 將 age 在大於 10 且小於 20 的設為 "10-20"
+    df.loc[(df["age"] > 10) & (df["age"] <= 20), "屋齡"] = "10-20年"
+    df.loc[(df["age"] > 20) & (df["age"] <= 30), "屋齡"] = "20-30年"
+    df.loc[(df["age"] > 30) , "屋齡"] = "30年以上"
+
+    #計算每年的平均房價，並設為索引
+    average_prices = df.loc[(df["區域"]==f"{dis}")].groupby(['年份', 'type', "屋齡"])['square(坪)'].mean().reset_index()
+
+    # 繪製長條圖
+    bar_chart = px.bar(average_prices, x='年份', y='square(坪)', color='type', barmode='group', facet_col="屋齡", \
+                    title=f'{dis}各屋齡坪數長條圖')
+    bar_chart.update_layout(
+    yaxis_title="坪數"
+)
+   
+    # 加入篩選器元件
+    def update_layout(fig,x):
+        fig.update_layout(
+            updatemenus=[
+                dict(
+                    buttons=list([
+                        dict(
+                            label="全部",
+                            method="update",
+                            args=[{"visible": [True, True, True,True, True, True,True]},
+                                {"title": f"{dis}各屋齡坪數{x}圖 - 全部"}]
+                        ),
+                        dict(
+                            label="華廈",
+                            method="update",
+                            args=[{"visible":  [False, False, False,False,False, False, False,False,True,True,True,True]},
+                                {"title": f"{dis}各屋齡坪數{x}圖 - 華廈"}]
+                        ),
+                        dict(
+                            label="公寓",
+                            method="update",
+                            args=[{"visible": [False, False, False,False,True, True, True,True,False,False]},
+                                {"title": f"{dis}各屋齡坪數{x}圖 - 公寓"}]
+                        ),
+                        dict(
+                            label="住宅大樓",
+                            method="update",
+                            args=[{"visible": [True, True, True,True,False, False, False,False,False,False,False,False]},
+                                {"title": f"{dis}各屋齡坪數{x}圖 - 住宅大樓"}]
+                        ),
+                    ]),
+                    direction="down",
+                    showactive=True,
+                    x=0.8,
+                    xanchor="center",
+                    y=1.2,
+                    yanchor="top"
+                ),
+            ]
+        )
+        # fig.update_yaxes(range=[0, 40])  # 設定 y 軸的範圍，例如 0 到 50
+
+    # update_layout(line_chart,"折線")
+    update_layout(bar_chart,"長條")
+    
+    # line_chart.show()
+    bar_chart.show()
+    # # 生成HTML文件
     # line_chart.write_html('line_chart.html')
-    scatter_chart.write_html(f'scatter_trading_{dis}.html')
+    bar_chart.write_html(f'age_avg_square_{dis}.html')
+
+
+def age_avg_totalprice(data1,dis):
+    #複製dataframe來進行操作
+    df = data1.copy()
+    # 將日期欄位轉換成年份欄位
+    df['年份'] = pd.to_datetime(df['date']).dt.year
+
+    #創屋齡group欄位
+    # 將 age 在小於等於 10 的設為 "0-10"
+    df["屋齡"] = np.where(df["age"] <= 10, "0-10年", "")
+    # 將 age 在大於 10 且小於 20 的設為 "10-20"
+    df.loc[(df["age"] > 10) & (df["age"] <= 20), "屋齡"] = "10-20年"
+    df.loc[(df["age"] > 20) & (df["age"] <= 30), "屋齡"] = "20-30年"
+    df.loc[(df["age"] > 30) , "屋齡"] = "30年以上"
+
+    #計算每年的平均房價，並設為索引
+    average_prices = df.loc[(df["區域"]==f"{dis}")].groupby(['年份', 'type', "屋齡"])["total_price(萬)"].mean().reset_index()
+
+    # 繪製長條圖
+    bar_chart = px.bar(average_prices, x='年份', y='total_price(萬)', color='type', barmode='group', facet_col="屋齡", \
+                    title=f'{dis}各屋齡平均購屋總價長條圖')
+    bar_chart.update_layout(
+    yaxis_title="總價"
+)
+   
+    # 加入篩選器元件
+    def update_layout(fig,x):
+        fig.update_layout(
+            updatemenus=[
+                dict(
+                    buttons=list([
+                        dict(
+                            label="全部",
+                            method="update",
+                            args=[{"visible": [True, True, True,True, True, True,True]},
+                                {"title": f"{dis}各屋齡平均購屋總價{x}圖 - 全部"}]
+                        ),
+                        dict(
+                            label="華廈",
+                            method="update",
+                            args=[{"visible":  [False, False, False,False,False, False, False,False,True,True,True,True]},
+                                {"title": f"{dis}各屋齡平均購屋總價{x}圖 - 華廈"}]
+                        ),
+                        dict(
+                            label="公寓",
+                            method="update",
+                            args=[{"visible": [False, False, False,False,True, True, True,True,False,False]},
+                                {"title": f"{dis}各屋齡平均購屋總價{x}圖 - 公寓"}]
+                        ),
+                        dict(
+                            label="住宅大樓",
+                            method="update",
+                            args=[{"visible": [True, True, True,True,False, False, False,False,False,False,False,False]},
+                                {"title": f"{dis}各屋齡平均購屋總價{x}圖 - 住宅大樓"}]
+                        ),
+                    ]),
+                    direction="down",
+                    showactive=True,
+                    x=0.8,
+                    xanchor="center",
+                    y=1.2,
+                    yanchor="top"
+                ),
+            ]
+        )
+        # fig.update_yaxes(range=[0, 40])  # 設定 y 軸的範圍，例如 0 到 50
+
+    # update_layout(line_chart,"折線")
+    update_layout(bar_chart,"長條")
+    
+    # line_chart.show()
+    bar_chart.show()
+    # # 生成HTML文件
+    # line_chart.write_html('line_chart.html')
+    bar_chart.write_html(f'age_avg_totalprice_{dis}.html')
+
 
 def rate_consumerprice_rentprice(table):
     #複製dataframe來進行操作
@@ -415,28 +759,39 @@ def rate_consumerprice_rentprice(table):
     # else : return 
     # 繪製折線圖
     line_chart = px.line(df, x='date', y=df.columns[1:],title=table)
-    line_chart.update_layout(yaxis_title=f"全國{table}")
+    line_chart.update_layout(
+    yaxis_title=f"全國{table}"
+)
 
     line_chart.show()
     # 生成HTML文件
     line_chart.write_html(f'{table}.html')
 
+
+
 if __name__ == '__main__':
     #每年綜合的平均房價
     totalyear_avg_houseprice(df)
+    totalyear_avg_square(df)
+    totalyear_avg_totalprice(df)
+    type_trading(df)
+    age_trading(df)
     dis = ["文山區","新店區"]
     year = ["2015","2016","2017","2018","2019","2020"]
-    otherdata = ["五大行庫平均房貸利率","住宅價格指數","可能成交指數","房價所得比","消費者物價指數","租金指數","貸款負擔率"]
+    otherdata = ["五大行庫平均房貸利率","住宅價格指數","可能成交指數","消費者物價指數","租金指數","貸款負擔率"]
     for i in otherdata:
         rate_consumerprice_rentprice(i)
     #每年每區的平均房價
     for index in dis:
         #每年不同屋齡房型的房價
         age_avg_houseprice(df,index)
-        age_type_trading(df,index)
+        age_avg_square(df,index)
+        age_avg_totalprice(df,index)
         for value in year:
             year_avg_houseprice(df,value,index)
             year_30avg_houseprice(df,value,index)
+
+
 
 
 

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script type="text/javascript" src="123.js"></script>
+    <title>Document</title>
+</head>
+<body>
+    <style>
+        input[type="radio"]:checked + label {
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+    </style>
+
+    <form id="dataform" method="get">
+        <input type="radio" id="axigeaw_1" name="opendata" value="五大行庫平均房貸利率"/>
+        <label for="axigeaw_1">五大行庫平均房貸利率</label>
+        <input type="radio" id="axigeaw_2" name="opendata" value="住宅價格指數"/>
+        <label for="axigeaw_2">住宅價格指數</label>
+        <input type="radio" id="axigeaw_3" name="opendata" value="可能成交指數"/>
+        <label for="axigeaw_3">可能成交指數</label>
+        <input type="radio" id="axigeaw_4" name="opendata" value="消費者物價指數"/>
+        <label for="axigeaw_4">消費者物價指數</label><br>
+        <input type="radio" id="axigeaw_5" name="opendata" value="租金指數"/>
+        <label for="axigeaw_5">租金指數</label>
+        <input type="radio" id="axigeaw_9" name="opendata" value="貸款負擔率"/>
+        <label for="axigeaw_9">貸款負擔率</label>
+        <input type="radio" id="axigeaw_6" name="opendata" value="新店區與文山區歷年成交數據"/>
+        <label for="axigeaw_6">新店區與文山區歷年成交數據</label>
+        <input type="radio" id="axigeaw_7" name="opendata" value="新店區與文山區成交量"/>
+        <label for="axigeaw_7">新店區與文山區成交量</label>
+        <input type="radio" id="axigeaw_7" name="opendata" value="總結"/>
+        <label for="axigeaw_7">總結</label>
+        <br>
+        <button type="submit">Submit</button>
+    </form>
+
+    <div id="test"></div>
+    <script>
+        document.getElementById('dataform').addEventListener('submit', function(even) {
+        event.preventDefault(); // 防止表單直接提交
+    
+        // 取得選擇的值
+        var selectedValue = document.querySelector('input[name="opendata"]:checked').value;
+
+        var index = document.getElementById('test');
+        if(selectedValue == "五大行庫平均房貸利率") {
+            index.innerHTML=`
+                <iframe src="五大行庫平均房貸利率.html" frameborder="0" width="80%" height="600"></iframe>
+                <p>金融海嘯後，台灣央行採取了<span style="color: red;">貨幣寬鬆政策</span>加強資金流動和擴大信貸供應，2015-2022年間房市利率持續下跌，</p>
+                <p>直至2022年受到疫情及俄烏戰爭等方面影響，使得各國通貨膨脹嚴重，各國央行開始轉向貨幣緊縮，房貸利率也因此逐步升高</p>
+                <p>而截至今年4月，平均房貸利率已達到近14年來新高</p>`
+    }else if(selectedValue == "住宅價格指數"){
+        index.innerHTML=`<iframe src="住宅價格指數.html" frameborder="0" width="80%" height="600"></iframe>
+    <p>2020年第二季後，隨著疫情的擴大，以及人們受到以前SARS期間投入房市獲利的既有印象影響，民眾對於購屋投資的需求大漲</p>
+    <p>在購屋需求攀升的背景下，房價亦同步攀升</p>`
+    }else if(selectedValue == "可能成交指數"){
+        index.innerHTML=`<iframe src="可能成交指數.html" frameborder="0" width="80%" height="600"></iframe>
+    <p>而成交可能的價格指數也在疫情期間越來越高</p>
+    <p>主要受到<span style="color: red;">預期獲利的心理、需求量不減、營建成本高漲、賣方不願降價</span>等因素影響</p>`
+    }else if(selectedValue == "消費者物價指數"){
+        index.innerHTML=`<iframe src="消費者物價指數.html" frameborder="0" width="80%" height="600"></iframe>
+    <p>而在通貨膨脹的情況下，消費者物價指數也隨之攀高，並且達到了歷年來最高點</p>`
+    }else if(selectedValue == "租金指數"){
+        index.innerHTML=`<iframe src="租金指數.html" frameborder="0" width="80%" height="600"></iframe>
+    <p>租金本身也是長年受到大環境因素，及房市現況影響很深的部分，加之租金市場本身的不透明</p>
+    <p>如今可統計到的租金價格指數，亦來到了歷年來最高點</p>  `
+    }else if(selectedValue == "貸款負擔率"){
+        index.innerHTML=`<iframe src="貸款負擔率.html" frameborder="0" width="80%" height="600"></iframe>
+    <p>對於本次報告的文山區及新店區所在的雙北，做為主要行政區，一直都是高房價的代名詞</p>
+    <p>相較於全國的房貸負擔，雙北的房貸負擔率很明顯地較高</p>`
+    }else if(selectedValue == "新店區與文山區歷年成交數據"){
+        index.innerHTML=`<iframe src="bar_totalyearprice.html" frameborder="0" width="80%" height="600"></iframe>
+    <p>再來說歷年的文山區及新店區</p>
+    <p>這是每年平均單坪房價的圖表，我們可以很明顯看出，雖然有些許起伏，但兩個區整體都處於一個十分穩定的房價區間</p>
+    <br>
+    <iframe src="totalyear_avg_square.html" frameborder="0" width="80%" height="600"></iframe>
+    <p>再從每年平均的成交坪數來說，可以普遍看到在文山區購屋的人偏好較大坪數的房型，相對來說新店區的坪數較小</p>
+    <br>
+    <iframe src="totalyear_avg_totalprice.html" frameborder="0" width="80%" height="600"></iframe>
+    <p>從這之中可以看到，雖然兩者的單坪房價並沒有太大的差異，但因為偏好的購屋不同的關係，所以歷年的購屋總價都呈現出「文山區>新店區」的一個狀況。</p>`
+    }else if(selectedValue == "新店區與文山區成交量"){
+        index.innerHTML=`<iframe src="scatter_trading_age.html" frameborder="0" width="80%" height="600"></iframe>
+    <iframe src="scatter_trading_type.html" frameborder="0" width="80%" height="600"></iframe>`
+    }else if(selectedValue == "總結"){
+        index.innerHTML=`<h3>綜合所有，很顯然，雖然央行已宣布暫時不再漲利率，並且祭出平均地權條例來試圖影響房市現況</h3>
+        <h3>但基於「營建成本持高不降」、「賣方仍在觀望」等因素，短期內怕是仍無法動搖房市現況</h3>
+        <h3>因此今年度的房市仍會處於一個<span style="color: red;">買房高點、貸款負擔金額高、銀行可核貸額度調降</span>的一個位置</h3>`
+};
+})
+    </script>
+
+</body>
+</html>

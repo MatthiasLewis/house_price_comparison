@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script>
+        function showChart() {
+            var areaSelect = document.getElementById("areaSelect");
+            var selectedArea = areaSelect.value;
+            var chartContainer = document.getElementById("chartContainer");
+
+            if (selectedArea === "文山區") {
+                var iframe = document.createElement("iframe");
+                iframe.src = "scatter_trading_文山區.html";
+                iframe.frameborder = "0";
+                iframe.width = "80%";
+                iframe.height = "600";
+                chartContainer.innerHTML = "";
+                chartContainer.appendChild(iframe);
+            } else if (selectedArea === "新店區") {
+                var iframe = document.createElement("iframe");
+                iframe.src = "scatter_trading_新店區.html";
+                iframe.frameborder = "0";
+                iframe.width = "80%";
+                iframe.height = "600";
+                chartContainer.innerHTML = "";
+                chartContainer.appendChild(iframe);
+            } else {
+                chartContainer.innerHTML = "";
+            }
+        }
+    </script>
+</head>
+<body>
+    <select id="areaSelect" onchange="showChart()">
+        <option value="">選擇區域</option>
+        <option value="文山區">文山區</option>
+        <option value="新店區">新店區</option>
+    </select>
+
+    <div id="chartContainer"></div>
+</body>
+</html>

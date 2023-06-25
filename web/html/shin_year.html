@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>新店區單坪房價趨勢圖</title>
+</head>
+<body>
+    <select id="yearSelect" onchange="showChart()">
+        <option value="">Select a year</option>
+        <option value="2015">2015</option>
+        <option value="2016">2016</option>
+        <option value="2017">2017</option>
+        <option value="2018">2018</option>
+        <option value="2019">2019</option>
+        <option value="2020">2020</option>
+    </select>
+
+    <div id="chartContainer"></div>
+
+    <script>
+        function showChart() {
+            var year = document.getElementById("yearSelect").value;
+            var chartContainer = document.getElementById("chartContainer");
+
+            if (year !== "") {
+                var iframe = document.createElement("iframe");
+                iframe.src = "line_yearprice_新店區_" + year + ".html";
+                iframe.frameborder = "0";
+                iframe.width = "80%";
+                iframe.height = "600";
+                chartContainer.innerHTML = "";
+                chartContainer.appendChild(iframe);
+            } else {
+                chartContainer.innerHTML = "";
+            }
+        }
+    </script>
+</body>
+</html>
